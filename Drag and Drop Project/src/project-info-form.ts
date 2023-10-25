@@ -1,3 +1,6 @@
+import { ProjectMixin } from "./mixins/project-mixin.js";
+import { applyMixin } from "./mixins/project-mixin.js";
+
 import { ProjectInfo } from "./types/project-input.js";
 import { ValidationRules } from "./types/validable-type.js";
 
@@ -8,11 +11,11 @@ class ProjectInfoForm {
   private form: HTMLFormElement;
   private inputPeopleNumber: HTMLInputElement;
   private inputTitle: HTMLInputElement;
-  private targetElement: HTMLDivElement;
-  private template: HTMLTemplateElement;
+
   private txtDescription: HTMLTextAreaElement;
 
   constructor() {
+    applyMixin(ProjectInfoForm, [ProjectMixin]);
     this.template = document.getElementById(
       "project-input"
     )! as HTMLTemplateElement;
@@ -95,5 +98,7 @@ class ProjectInfoForm {
     this.clearProjectInputsForm();
   }
 }
+
+interface ProjectInfoForm extends ProjectMixin {}
 
 export { ProjectInfoForm };
