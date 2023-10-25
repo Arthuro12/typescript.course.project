@@ -1,2 +1,0 @@
-In the "index.html" file we find the "template" tag, which allows us to specify code that isn't rendered when the web document is loaded, 
-but which can be manipulated by JavaScript to be rendered later.
