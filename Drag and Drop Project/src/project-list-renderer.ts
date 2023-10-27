@@ -1,13 +1,14 @@
 import { ProjectMixin } from "./mixins/project-mixin.js";
 import { applyMixin } from "./mixins/project-mixin.js";
 
-import { ProjectItem } from "./project-item.js";
+import { ProjectInfo } from "./types/project-info.js";
+
+import { projectStateManager } from "./project-state-manager.js";
 
 class ProjectListRenderer {
   // private projectList: HTMLLIElement;
-  // private projectListTemplate: HTMLTemplateElement;
+  private assignedProjects: ProjectInfo[];
   private sectionProject: HTMLElement;
-  //private targetElement: HTMLDivElement;
   constructor(private state: "activ" | "finished") {
     applyMixin(ProjectListRenderer, [ProjectMixin]);
     this.template = document.getElementById(
@@ -20,14 +21,29 @@ class ProjectListRenderer {
     this.targetElement = document.getElementById("app") as HTMLDivElement;
     this.sectionProject = clone.firstElementChild! as HTMLElement;
     this.sectionProject.setAttribute("id", `${this.state}-projects`);
-    const headerProject = this.sectionProject.querySelector("header");
-    const ulProjects = this.sectionProject!.querySelector("ul");
+
+    projectStateManager.addListener((projectList: ProjectInfo[]) => {
+      this.assignedProjects = projectList;
+      this.renderProjects();
+    });
+
     this.renderSection();
     this.renderContent();
     console.log(this.targetElement);
   }
 
-  renderContent() {
+  private renderProjects() {
+    const ulElementProjects: HTMLUListElement = document.getElementById(
+      `${this.state}-projects-list`
+    ) as HTMLUListElement;
+    for (const currProject of this.assignedProjects) {
+      const liProjectTitle = document.createElement("li");
+      liProjectTitle.textContent = currProject.title;
+      ulElementProjects.appendChild(liProjectTitle);
+    }
+  }
+
+  private renderContent() {
     const listId = `${this.state}-projects-list`;
     this.sectionProject.querySelector("ul")!.id = listId;
     this.sectionProject
@@ -36,7 +52,7 @@ class ProjectListRenderer {
       this.state.toUpperCase() + " PROJECTS";
   }
 
-  renderSection() {
+  private renderSection() {
     this.targetElement.insertAdjacentElement("beforeend", this.sectionProject);
   }
 }

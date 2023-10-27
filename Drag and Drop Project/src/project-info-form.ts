@@ -1,20 +1,24 @@
 import { ProjectMixin } from "./mixins/project-mixin.js";
 import { applyMixin } from "./mixins/project-mixin.js";
 
-import { ProjectInfo } from "./types/project-input.js";
+import { ProjectInfo } from "./types/project-info.js";
 import { ValidationRules } from "./types/validable-type.js";
 
 import { boundThis } from "./decorators/decorators.js";
 import { validate } from "./toolbox/validation-toolbox.js";
 
+import { projectStateManager } from "./project-state-manager.js";
+
 class ProjectInfoForm {
+  private static instance: ProjectInfoForm;
+
   private form: HTMLFormElement;
   private inputPeopleNumber: HTMLInputElement;
   private inputTitle: HTMLInputElement;
 
   private txtDescription: HTMLTextAreaElement;
 
-  constructor() {
+  private constructor() {
     applyMixin(ProjectInfoForm, [ProjectMixin]);
     this.template = document.getElementById(
       "project-input"
@@ -42,6 +46,14 @@ class ProjectInfoForm {
 
   private configure() {
     this.form.addEventListener("submit", this.submitEventListener);
+  }
+
+  public static getInstance() {
+    if (ProjectInfoForm.instance != null) {
+      return ProjectInfoForm.instance;
+    }
+    ProjectInfoForm.instance = new ProjectInfoForm();
+    return ProjectInfoForm.instance;
   }
 
   private getUserInputs(): ProjectInfo {
@@ -95,7 +107,11 @@ class ProjectInfoForm {
   private submitEventListener(event: Event) {
     event.preventDefault();
     const userInput: ProjectInfo = this.getUserInputs();
-    this.clearProjectInputsForm();
+    if (typeof userInput === "object" && userInput != null) {
+      const { title, peopleNumber, description } = userInput;
+      projectStateManager.addProject(title, peopleNumber, description);
+      this.clearProjectInputsForm();
+    }
   }
 }
 
