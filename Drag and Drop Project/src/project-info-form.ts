@@ -1,8 +1,9 @@
 import { ProjectMixin } from "./mixins/project-mixin.js";
 import { applyMixin } from "./mixins/project-mixin.js";
 
-import { ProjectInfo } from "./types/project-info.js";
+import { IProjectInfo } from "./types/project-info.js";
 import { ValidationRules } from "./types/validable-type.js";
+import { ProjectState } from "./types/project-state-enum.js";
 
 import { boundThis } from "./decorators/decorators.js";
 import { validate } from "./toolbox/validation-toolbox.js";
@@ -56,7 +57,7 @@ class ProjectInfoForm {
     return ProjectInfoForm.instance;
   }
 
-  private getUserInputs(): ProjectInfo {
+  private getUserInputs(): IProjectInfo {
     const title: string = this.inputTitle.value;
     const peopleNumber: number = +this.inputPeopleNumber.value;
     const description: string = this.txtDescription.value;
@@ -106,10 +107,15 @@ class ProjectInfoForm {
   @boundThis
   private submitEventListener(event: Event) {
     event.preventDefault();
-    const userInput: ProjectInfo = this.getUserInputs();
+    const userInput: IProjectInfo = this.getUserInputs();
     if (typeof userInput === "object" && userInput != null) {
       const { title, peopleNumber, description } = userInput;
-      projectStateManager.addProject(title, peopleNumber, description);
+      projectStateManager.addProject(
+        title,
+        peopleNumber,
+        description,
+        ProjectState.Activ
+      );
       this.clearProjectInputsForm();
     }
   }

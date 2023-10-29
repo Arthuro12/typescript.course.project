@@ -1,13 +1,13 @@
 import { ProjectMixin } from "./mixins/project-mixin.js";
 import { applyMixin } from "./mixins/project-mixin.js";
 
-import { ProjectInfo } from "./types/project-info.js";
+import { IProjectInfo } from "./types/project-info.js";
 
 import { projectStateManager } from "./project-state-manager.js";
+import { ProjectState } from "./types/project-state-enum.js";
 
 class ProjectListRenderer {
-  // private projectList: HTMLLIElement;
-  private assignedProjects: ProjectInfo[];
+  private assignedProjects: IProjectInfo[];
   private sectionProject: HTMLElement;
   constructor(private state: "activ" | "finished") {
     applyMixin(ProjectListRenderer, [ProjectMixin]);
@@ -21,15 +21,31 @@ class ProjectListRenderer {
     this.targetElement = document.getElementById("app") as HTMLDivElement;
     this.sectionProject = clone.firstElementChild! as HTMLElement;
     this.sectionProject.setAttribute("id", `${this.state}-projects`);
-
-    projectStateManager.addListener((projectList: ProjectInfo[]) => {
-      this.assignedProjects = projectList;
+    projectStateManager.addListener((projectList: IProjectInfo[]) => {
+      let renderedProjectList: IProjectInfo[] = [];
+      let projectsToRender: IProjectInfo[] = [];
+      if (projectList.length > 1) {
+        renderedProjectList = projectList.slice(projectList.length - 1);
+        projectsToRender = this.getProjectByState(renderedProjectList);
+      } else {
+        projectsToRender = this.getProjectByState(projectList);
+      }
+      this.assignedProjects = projectsToRender;
       this.renderProjects();
     });
 
     this.renderSection();
     this.renderContent();
-    console.log(this.targetElement);
+  }
+
+  public getProjectByState(projectList: IProjectInfo[]) {
+    return projectList.filter((project: IProjectInfo) => {
+      if (this.state === "activ") {
+        return project.state === ProjectState.Activ;
+      } else {
+        return project.state === ProjectState.Finished;
+      }
+    });
   }
 
   private renderProjects() {
@@ -38,8 +54,15 @@ class ProjectListRenderer {
     ) as HTMLUListElement;
     for (const currProject of this.assignedProjects) {
       const liProjectTitle = document.createElement("li");
-      liProjectTitle.textContent = currProject.title;
-      ulElementProjects.appendChild(liProjectTitle);
+      const foundProject = this.assignedProjects.filter(
+        (curAssignedProject: IProjectInfo) => {
+          return curAssignedProject.id === currProject.id;
+        }
+      );
+      if (foundProject != null) {
+        liProjectTitle.textContent = currProject.title;
+        ulElementProjects.appendChild(liProjectTitle);
+      }
     }
   }
 

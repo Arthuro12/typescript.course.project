@@ -1,7 +1,11 @@
-interface ProjectInfo {
+import { ProjectState } from "./project-state-enum";
+
+interface IProjectInfo {
+  id?: string;
   title: string;
   peopleNumber: number;
   description: string;
+  state?: ProjectState;
 }
 
-export { ProjectInfo };
+export { IProjectInfo };

@@ -1,32 +1,45 @@
-import { v4 as uuidv4 } from "uuid";
-import { ProjectInfo } from "./types/project-info.js";
+// import { v4 as uuidv4 } from "uuid";
+
+import { IProjectInfo } from "./types/project-info";
+import { ProjectInfo } from "./project-info.js";
+import { ProjectState } from "./types/project-state-enum.js";
+import { Listener } from "./types/listener-type";
 
 export class ProjectStateManager {
   private static instance: ProjectStateManager;
 
-  private listeners: any[] = [];
+  private listeners: Listener[] = [];
   //@ts-ignore
-  private projects: ProjectInfo & { id: string }[] = [];
+  private projects: IProjectInfo[] = [];
   // private projects: any[] = [];
 
   private constructor() {}
 
-  addListener(listenerFn: Function) {
+  addListener(listenerFn: Listener) {
     this.listeners.push(listenerFn);
   }
 
-  addProject(title: string, peopleNumber: number, description: string): void {
-    const newProject: ProjectInfo & { id: string } = {
-      id: uuidv4(),
-      title: title,
-      peopleNumber: peopleNumber,
-      description: description,
-    };
+  addProject(
+    title: string,
+    peopleNumber: number,
+    description: string,
+    state: ProjectState
+  ): void {
+    const newProject: IProjectInfo = new ProjectInfo(
+      //uuidv4(),
+      Math.random().toString(),
+      title,
+      peopleNumber,
+      description,
+      state
+    );
+    console.log(this.projects);
 
     this.projects.push(newProject);
 
     for (const listenerFn of this.listeners) {
-      listenerFn(JSON.parse(JSON.stringify(this.projects)));
+      // listenerFn(JSON.parse(JSON.stringify(this.projects)));
+      listenerFn(this.projects.slice());
     }
   }
 
