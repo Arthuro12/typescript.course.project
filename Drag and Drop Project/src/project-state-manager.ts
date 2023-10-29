@@ -1,22 +1,18 @@
 // import { v4 as uuidv4 } from "uuid";
+import { ProjectInfo } from "./project-info.js";
+import { State } from "./state.js";
 
 import { IProjectInfo } from "./types/project-info";
-import { ProjectInfo } from "./project-info.js";
 import { ProjectState } from "./types/project-state-enum.js";
 import { Listener } from "./types/listener-type";
 
-export class ProjectStateManager {
+export class ProjectStateManager extends State<IProjectInfo> {
   private static instance: ProjectStateManager;
-
-  private listeners: Listener[] = [];
   //@ts-ignore
   private projects: IProjectInfo[] = [];
-  // private projects: any[] = [];
 
-  private constructor() {}
-
-  addListener(listenerFn: Listener) {
-    this.listeners.push(listenerFn);
+  private constructor() {
+    super();
   }
 
   addProject(

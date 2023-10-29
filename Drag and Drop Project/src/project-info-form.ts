@@ -1,3 +1,4 @@
+import { Component } from "./component.js";
 import { ProjectMixin } from "./mixins/project-mixin.js";
 import { applyMixin } from "./mixins/project-mixin.js";
 
@@ -10,32 +11,15 @@ import { validate } from "./toolbox/validation-toolbox.js";
 
 import { projectStateManager } from "./project-state-manager.js";
 
-class ProjectInfoForm {
+class ProjectInfoForm extends Component<HTMLDivElement, HTMLFormElement> {
   private static instance: ProjectInfoForm;
-
-  private form: HTMLFormElement;
   private inputPeopleNumber: HTMLInputElement;
   private inputTitle: HTMLInputElement;
 
   private txtDescription: HTMLTextAreaElement;
 
   private constructor() {
-    applyMixin(ProjectInfoForm, [ProjectMixin]);
-    this.template = document.getElementById(
-      "project-input"
-    )! as HTMLTemplateElement;
-    this.targetElement = document.getElementById("app")! as HTMLDivElement;
-    const clone = document.importNode(this.template.content, true);
-    this.form = clone.firstElementChild as HTMLFormElement;
-    this.form.setAttribute("id", "project-info-form");
-    this.inputTitle = this.form.querySelector("#title") as HTMLInputElement;
-    this.txtDescription = this.form.querySelector(
-      "#description"
-    ) as HTMLTextAreaElement;
-    this.inputPeopleNumber = this.form.querySelector(
-      "#people"
-    ) as HTMLInputElement;
-    this.renderForm();
+    super("project-input", "app", true, "project-info-form");
     this.configure();
   }
 
@@ -45,8 +29,21 @@ class ProjectInfoForm {
     this.txtDescription.value = "";
   }
 
-  private configure() {
-    this.form.addEventListener("submit", this.submitEventListener);
+  configure() {
+    this.template = document.getElementById(
+      "project-input"
+    )! as HTMLTemplateElement;
+    this.inputTitle = this.attachedElement.querySelector(
+      "#title"
+    ) as HTMLInputElement;
+    this.txtDescription = this.attachedElement.querySelector(
+      "#description"
+    ) as HTMLTextAreaElement;
+    this.inputPeopleNumber = this.attachedElement.querySelector(
+      "#people"
+    ) as HTMLInputElement;
+
+    this.attachedElement.addEventListener("submit", this.submitEventListener);
   }
 
   public static getInstance() {
@@ -100,10 +97,6 @@ class ProjectInfoForm {
     };
   }
 
-  private renderForm() {
-    this.targetElement.insertAdjacentElement("afterbegin", this.form);
-  }
-
   @boundThis
   private submitEventListener(event: Event) {
     event.preventDefault();
@@ -120,7 +113,5 @@ class ProjectInfoForm {
     }
   }
 }
-
-interface ProjectInfoForm extends ProjectMixin {}
 
 export { ProjectInfoForm };

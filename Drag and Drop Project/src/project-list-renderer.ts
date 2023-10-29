@@ -1,26 +1,15 @@
-import { ProjectMixin } from "./mixins/project-mixin.js";
-import { applyMixin } from "./mixins/project-mixin.js";
+import { Component } from "./component.js";
 
 import { IProjectInfo } from "./types/project-info.js";
 
-import { projectStateManager } from "./project-state-manager.js";
-import { ProjectState } from "./types/project-state-enum";
+import { ProjectState } from "./types/project-state-enum.js";
 
-class ProjectListRenderer {
+import { projectStateManager } from "./project-state-manager.js";
+
+class ProjectListRenderer extends Component<HTMLDivElement, HTMLElement> {
   private assignedProjects: IProjectInfo[];
-  private sectionProject: HTMLElement;
   constructor(private state: "activ" | "finished") {
-    applyMixin(ProjectListRenderer, [ProjectMixin]);
-    this.template = document.getElementById(
-      "project-list"
-    )! as HTMLTemplateElement;
-    const clone: DocumentFragment = document.importNode(
-      this.template.content,
-      true
-    );
-    this.targetElement = document.getElementById("app") as HTMLDivElement;
-    this.sectionProject = clone.firstElementChild! as HTMLElement;
-    this.sectionProject.setAttribute("id", `${this.state}-projects`);
+    super("project-list", "app", false, `${state}-projects`);
     projectStateManager.addListener((projectList: IProjectInfo[]) => {
       let renderedProjectList: IProjectInfo[] = [];
       let projectsToRender: IProjectInfo[] = [];
@@ -34,9 +23,10 @@ class ProjectListRenderer {
       this.renderUlListProjects();
     });
 
-    this.renderSection();
     this.renderContent();
   }
+
+  configure(): void {}
 
   public getProjectByState(projectList: IProjectInfo[]) {
     return projectList.filter((project: IProjectInfo) => {
@@ -48,17 +38,14 @@ class ProjectListRenderer {
     });
   }
 
-  private renderContent() {
+  renderContent(): void {
     const listId = `${this.state}-projects-list`;
-    this.sectionProject.querySelector("ul")!.id = listId;
-    this.sectionProject
+    console.log(listId);
+    this.attachedElement.querySelector("ul")!.id = listId;
+    this.attachedElement
       .querySelector("header")!
       .querySelector("h2")!.textContent =
       this.state.toUpperCase() + " PROJECTS";
-  }
-
-  private renderSection() {
-    this.targetElement.insertAdjacentElement("beforeend", this.sectionProject);
   }
 
   private renderUlListProjects() {
@@ -80,6 +67,6 @@ class ProjectListRenderer {
   }
 }
 
-interface ProjectListRenderer extends ProjectMixin {}
+// interface ProjectListRenderer extends ProjectMixin {}
 
 export { ProjectListRenderer };
