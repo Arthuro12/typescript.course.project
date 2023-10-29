@@ -4,7 +4,7 @@ import { applyMixin } from "./mixins/project-mixin.js";
 import { IProjectInfo } from "./types/project-info.js";
 
 import { projectStateManager } from "./project-state-manager.js";
-import { ProjectState } from "./types/project-state-enum.js";
+import { ProjectState } from "./types/project-state-enum";
 
 class ProjectListRenderer {
   private assignedProjects: IProjectInfo[];
@@ -31,7 +31,7 @@ class ProjectListRenderer {
         projectsToRender = this.getProjectByState(projectList);
       }
       this.assignedProjects = projectsToRender;
-      this.renderProjects();
+      this.renderUlListProjects();
     });
 
     this.renderSection();
@@ -48,7 +48,20 @@ class ProjectListRenderer {
     });
   }
 
-  private renderProjects() {
+  private renderContent() {
+    const listId = `${this.state}-projects-list`;
+    this.sectionProject.querySelector("ul")!.id = listId;
+    this.sectionProject
+      .querySelector("header")!
+      .querySelector("h2")!.textContent =
+      this.state.toUpperCase() + " PROJECTS";
+  }
+
+  private renderSection() {
+    this.targetElement.insertAdjacentElement("beforeend", this.sectionProject);
+  }
+
+  private renderUlListProjects() {
     const ulElementProjects: HTMLUListElement = document.getElementById(
       `${this.state}-projects-list`
     ) as HTMLUListElement;
@@ -64,19 +77,6 @@ class ProjectListRenderer {
         ulElementProjects.appendChild(liProjectTitle);
       }
     }
-  }
-
-  private renderContent() {
-    const listId = `${this.state}-projects-list`;
-    this.sectionProject.querySelector("ul")!.id = listId;
-    this.sectionProject
-      .querySelector("header")!
-      .querySelector("h2")!.textContent =
-      this.state.toUpperCase() + " PROJECTS";
-  }
-
-  private renderSection() {
-    this.targetElement.insertAdjacentElement("beforeend", this.sectionProject);
   }
 }
 
