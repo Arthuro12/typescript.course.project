@@ -67,6 +67,4 @@ class ProjectListRenderer extends Component<HTMLDivElement, HTMLElement> {
   }
 }
 
-// interface ProjectListRenderer extends ProjectMixin {}
-
 export { ProjectListRenderer };

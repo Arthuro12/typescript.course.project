@@ -1,6 +1,4 @@
 import { Component } from "./component.js";
-import { ProjectMixin } from "./mixins/project-mixin.js";
-import { applyMixin } from "./mixins/project-mixin.js";
 
 import { IProjectInfo } from "./types/project-info.js";
 import { ValidationRules } from "./types/validable-type.js";

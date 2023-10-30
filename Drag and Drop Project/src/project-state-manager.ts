@@ -4,7 +4,6 @@ import { State } from "./state.js";
 
 import { IProjectInfo } from "./types/project-info";
 import { ProjectState } from "./types/project-state-enum.js";
-import { Listener } from "./types/listener-type";
 
 export class ProjectStateManager extends State<IProjectInfo> {
   private static instance: ProjectStateManager;
