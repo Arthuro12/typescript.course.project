@@ -1,7 +1,7 @@
 import { Component } from "./component.js";
 
-import { IProjectInfo } from "./types/project-info.js";
-import { ValidationRules } from "./types/validable-type.js";
+import { IProjectInfo } from "./types/project-info";
+import { ValidationRules } from "./types/validable-type";
 import { ProjectState } from "./types/project-state-enum.js";
 
 import { boundThis } from "./decorators/decorators.js";

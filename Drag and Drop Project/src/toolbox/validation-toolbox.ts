@@ -1,4 +1,4 @@
-import { ValidationRules } from "../types/validable-type.js";
+import { ValidationRules } from "../types/validable-type";
 
 function getValidNumber<T>(val: T, elseVal?: number): number {
   if (typeof elseVal === "undefined") {
