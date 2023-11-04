@@ -6,30 +6,56 @@ import { IProjectInfo } from "./types/project-info";
 import { ProjectState } from "./types/project-state-enum.js";
 
 import { projectStateManager } from "./project-state-manager.js";
+import { DragTarget } from "./types/drag-target.js";
+import { bindThis } from "./decorators/decorators.js";
 
-class ProjectListRenderer extends Component<HTMLDivElement, HTMLElement> {
+class ProjectListRenderer
+  extends Component<HTMLDivElement, HTMLElement>
+  implements DragTarget
+{
   private assignedProjects: IProjectInfo[];
   constructor(private state: "activ" | "finished") {
     super("project-list", "app", false, `${state}-projects`);
     projectStateManager.addListener((projectList: IProjectInfo[]) => {
       let renderedProjectList: IProjectInfo[] = [];
       let projectsToRender: IProjectInfo[] = [];
-      if (projectList.length > 1) {
-        renderedProjectList = projectList.slice(projectList.length - 1);
-        projectsToRender = this.getProjectByState(renderedProjectList);
-      } else {
-        projectsToRender = this.getProjectByState(projectList);
-      }
+      projectsToRender = this.getProjectsByState(projectList);
       this.assignedProjects = projectsToRender;
+      this.configure();
       this.renderUlListProjects();
     });
-
     this.renderContent();
   }
 
-  configure(): void {}
+  configure(): void {
+    this.attachedElement.addEventListener("dragover", this.dragOverHandler);
+    this.attachedElement.addEventListener("dragleave", this.dragLeaveHandler);
+    this.attachedElement.addEventListener("drop", this.dropHandler);
+  }
 
-  public getProjectByState(projectList: IProjectInfo[]) {
+  @bindThis
+  dragLeaveHandler(_: DragEvent): void {
+    const ulElement = this.attachedElement.querySelector("ul");
+    ulElement.classList.remove("droppable");
+  }
+
+  @bindThis
+  dragOverHandler(e: DragEvent): void {
+    e.preventDefault();
+    const ulElement = this.attachedElement.querySelector("ul");
+    ulElement.setAttribute("class", "droppable");
+  }
+
+  @bindThis
+  dropHandler(e: DragEvent): void {
+    const finishedProjectId: string = e.dataTransfer.getData("text/plain");
+    projectStateManager.moveProject(
+      finishedProjectId,
+      this.state === "activ" ? ProjectState.Activ : ProjectState.Finished
+    );
+  }
+
+  public getProjectsByState(projectList: IProjectInfo[]): IProjectInfo[] {
     return projectList.filter((project: IProjectInfo) => {
       if (this.state === "activ") {
         return project.state === ProjectState.Activ;
@@ -41,7 +67,6 @@ class ProjectListRenderer extends Component<HTMLDivElement, HTMLElement> {
 
   renderContent(): void {
     const listId = `${this.state}-projects-list`;
-    console.log(listId);
     this.attachedElement.querySelector("ul")!.id = listId;
     this.attachedElement
       .querySelector("header")!
@@ -49,28 +74,14 @@ class ProjectListRenderer extends Component<HTMLDivElement, HTMLElement> {
       this.state.toUpperCase() + " PROJECTS";
   }
 
-  private renderUlListProjects() {
-    const ulElementProjects: HTMLUListElement = document.getElementById(
-      `${this.state}-projects-list`
-    ) as HTMLUListElement;
-    if (ulElementProjects.querySelector("li") != null) {
-      // ulElementProjects.querySelector("li").innerHTML = "";
-    }
+  private renderUlListProjects(): void {
+    const liElement = document.getElementById(`${this.state}-projects-list`);
+    liElement.innerHTML = "";
     for (const currProject of this.assignedProjects) {
-      // const liProjectTitle = document.createElement("li");
       new ProjectItemRender(
         this.attachedElement.querySelector("ul").id,
         currProject
       );
-      // const foundProject = this.assignedProjects.filter(
-      //   (curAssignedProject: IProjectInfo) => {
-      //     return curAssignedProject.id === currProject.id;
-      //   }
-      // );
-      // if (foundProject != null) {
-      //   // liProjectTitle.textContent = currProject.title;
-      //   ulElementProjects.appendChild(liProjectTitle);
-      // }
     }
   }
 }
