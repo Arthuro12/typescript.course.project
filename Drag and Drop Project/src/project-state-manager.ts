@@ -28,14 +28,10 @@ export class ProjectStateManager extends State<IProjectInfo> {
       description,
       state
     );
-    console.log(this.projects);
 
     this.projects.push(newProject);
 
-    for (const listenerFn of this.listeners) {
-      // listenerFn(JSON.parse(JSON.stringify(this.projects)));
-      listenerFn(this.projects.slice());
-    }
+    this.updateListener();
   }
 
   public static getInstance() {
@@ -44,6 +40,23 @@ export class ProjectStateManager extends State<IProjectInfo> {
     }
     ProjectStateManager.instance = new ProjectStateManager();
     return ProjectStateManager.instance;
+  }
+
+  moveProject(projectId: string, newState: ProjectState): void {
+    const movedProject: IProjectInfo = this.projects.find((curProject) => {
+      return curProject.id === projectId;
+    });
+
+    if (movedProject != null) {
+      movedProject.state = newState;
+      this.updateListener();
+    }
+  }
+
+  updateListener() {
+    for (const listenerFn of this.listeners) {
+      listenerFn(this.projects.slice());
+    }
   }
 }
 
