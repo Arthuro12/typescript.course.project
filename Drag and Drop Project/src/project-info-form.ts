@@ -4,7 +4,7 @@ import { IProjectInfo } from "./types/project-info";
 import { ValidationRules } from "./types/validable-type";
 import { ProjectState } from "./types/project-state-enum.js";
 
-import { boundThis } from "./decorators/decorators.js";
+import { bindThis } from "./decorators/decorators.js";
 import { validate } from "./toolbox/validation-toolbox.js";
 
 import { projectStateManager } from "./project-state-manager.js";
@@ -83,11 +83,6 @@ class ProjectInfoForm extends Component<HTMLDivElement, HTMLFormElement> {
       //@ts-ignore
       return;
     }
-    console.log({
-      title,
-      peopleNumber,
-      description,
-    });
     return {
       title,
       peopleNumber,
@@ -95,7 +90,7 @@ class ProjectInfoForm extends Component<HTMLDivElement, HTMLFormElement> {
     };
   }
 
-  @boundThis
+  @bindThis
   private submitEventListener(event: Event) {
     event.preventDefault();
     const userInput: IProjectInfo = this.getUserInputs();
