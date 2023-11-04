@@ -6,7 +6,7 @@ import { IProjectInfo } from "./types/project-info";
 import { ProjectState } from "./types/project-state-enum.js";
 
 import { projectStateManager } from "./project-state-manager.js";
-import { DragTarget } from "./types/drag-target.js";
+import { DragTarget } from "./types/drag-target";
 import { bindThis } from "./decorators/decorators.js";
 
 class ProjectListRenderer
