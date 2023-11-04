@@ -1,4 +1,4 @@
-function boundThis(target: any, name: string, descriptor: PropertyDescriptor) {
+function bindThis(target: any, name: string, descriptor: PropertyDescriptor) {
   return {
     configurable: true,
     get() {
@@ -7,4 +7,4 @@ function boundThis(target: any, name: string, descriptor: PropertyDescriptor) {
   };
 }
 
-export { boundThis };
+export { bindThis };
